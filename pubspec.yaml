@@ -1,7 +1,7 @@
 name: throttling
 description: Throttler and debouncer
-version: 0.0.1
-author: plugfox
+version: 0.5.0
+author: plugfox <plugfox@gmail.com>
 homepage: https://github.com/PlugFox/throttling
 
 environment:
