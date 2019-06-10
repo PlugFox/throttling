@@ -1,8 +1,8 @@
-import 'package:throttling_example/src/example.dart';
+import './src/example.dart';
 
 void main() async {
   print('\n# BEGIN');
-  await throttleExample();
-  await debounceExample();
+  await Example.throttleExample();
+  await Example.debounceExample();
   print('\n# END');
 }

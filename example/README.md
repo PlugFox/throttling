@@ -1,6 +1,6 @@
 # EXAMPLES
 
-See demonstration of use on the <u><a href="https://dartpad.dartlang.org/8630021e5c7ab9d27b74e86372f74c31" target="_blank">dartpad.dartlang.org</a></u>
+See demonstration of use on the [dartpad.dartlang.org](https://dartpad.dartlang.org/8630021e5c7ab9d27b74e86372f74c31) 
   
 ### Throttling example
 ```dart
