@@ -1,11 +1,11 @@
 name: throttling
 description: contain "throttling" and "debouncing" async helper classes with listeners for flutter
-version: 0.5.0
+version: 0.6.0
 author: plugfox <plugfox@gmail.com>
 homepage: https://github.com/PlugFox/throttling
 
 environment:
-  sdk: ">=2.1.0 <3.0.0"
+  sdk: ">=2.0.0 <3.0.0"
 
 dependencies:
   flutter:
