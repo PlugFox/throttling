@@ -1,5 +1,5 @@
-name: throttling
-description: contain "throttling" and "debouncing" async helper classes with listeners for flutter
+name: throttling_example
+description: Demonstrates how to use the "throttling" and "debouncing" async helper classes with listeners for flutter
 version: 0.5.0
 author: plugfox <plugfox@gmail.com>
 homepage: https://github.com/PlugFox/throttling
@@ -15,5 +15,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-flutter:
+  throttling:
+    path: ../
 
+flutter:
