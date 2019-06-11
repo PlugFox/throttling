@@ -2,6 +2,8 @@
 ##### *contain "throttling" and "debouncing" classes*  
 [![pub package](https://img.shields.io/pub/v/throttling.svg)](https://pub.dev/packages/throttling)  
   
+  
+## Using  
 See demonstration of use on the [dartpad.dartlang.org](https://dartpad.dartlang.org/8630021e5c7ab9d27b74e86372f74c31)
   
 ### Throttling example
