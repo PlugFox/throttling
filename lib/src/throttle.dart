@@ -30,7 +30,9 @@ class Throttling {
     _waiter
       ..then((_) {
         this._isReady = true;
-        this._stateSC.sink.add(true);
+        if (!_stateSC.isClosed) {
+          this._stateSC.sink.add(true);
+        }
       });
     return Function.apply(func, []);
   }
