@@ -10,7 +10,7 @@ class Debouncing {
     this._duration = value;
   }
 
-  Timer _waiter;
+  Timer? _waiter;
   bool _isReady = true;
   bool get isReady => isReady;
   // ignore: close_sinks
