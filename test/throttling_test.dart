@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:throttling/throttling.dart';
+import 'package:flutter_throttling/flutter_throttling.dart';
 import 'dart:async';
 
 void main() {

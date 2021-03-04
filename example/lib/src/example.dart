@@ -1,4 +1,4 @@
-import 'package:throttling/throttling.dart';
+import 'package:flutter_throttling/flutter_throttling.dart';
 import 'dart:async';
 
 abstract class Example {

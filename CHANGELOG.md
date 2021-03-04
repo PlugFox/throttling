@@ -1,3 +1,7 @@
+## [1.0.0] - 2021.03.04
+
+* Migrate to null safety
+
 ## [0.9.0] - 2020.11.05  
   
 * resolve a bug that can throw "Bad state: Cannot add new events after calling close"  
