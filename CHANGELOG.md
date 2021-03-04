@@ -1,3 +1,7 @@
+## [1.0.1] - 2021.03.04
+
+* Reference to original package
+
 ## [1.0.0] - 2021.03.04
 
 * Migrate to null safety
