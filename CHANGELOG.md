@@ -1,3 +1,8 @@
+## [0.9.1] - 2021.02.06
+  
+* resolve pedantic issues  
+* add function documentation for throttle and debounce
+
 ## [0.9.0] - 2020.11.05  
   
 * resolve a bug that can throw "Bad state: Cannot add new events after calling close"  

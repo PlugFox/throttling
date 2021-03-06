@@ -75,7 +75,7 @@ void main() {
 
   test('Debouncing', () async {
     print('# Debouncing test');
-    final deb = Debouncing(duration: Duration(seconds: 1));
+    final Debouncing deb = new Debouncing(duration: Duration(seconds: 1));
     expect(deb is Debouncing, true);
     expect(deb.duration is Duration, true);
     expect(deb.duration, const Duration(seconds: 1));
