@@ -1,10 +1,12 @@
-## [1.0.1] - 2021.03.04
-
-* Reference to original package
-
-## [1.0.0] - 2021.03.04
+## [1.0.0-dev] - 2021.03.04
 
 * Migrate to null safety
+* Reference to original package
+
+## [0.9.1] - 2021.02.06
+  
+* resolve pedantic issues  
+* add function documentation for throttle and debounce
 
 ## [0.9.0] - 2020.11.05  
   
@@ -23,4 +25,3 @@
 ## [0.5.0] - 2019.06.11  
   
 * initial release.  
-  
