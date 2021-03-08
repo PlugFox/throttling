@@ -1,6 +1,7 @@
-import 'package:test/test.dart';
-import 'package:flutter_throttling/flutter_throttling.dart';
 import 'dart:async';
+
+import 'package:test/test.dart';
+import 'package:throttling/throttling.dart';
 
 void main() {
   test('Throttling', () async {

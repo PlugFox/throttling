@@ -1,10 +1,14 @@
 import 'dart:async';
 
-///  Debouncing
-///  Have method [debounce]
-class Debouncing {
+/// Debouncing
+/// Have method [debounce]
+class Debouncing extends Stream<bool> implements Sink<Function> {
   Duration _duration;
+
+  /// Get current duration
   Duration get duration => _duration;
+
+  /// Set new duration
   set duration(Duration value) {
     assert(duration is Duration && !duration.isNegative);
     _duration = value;
@@ -12,6 +16,8 @@ class Debouncing {
 
   Timer? _waiter;
   bool _isReady = true;
+
+  /// is ready
   bool get isReady => _isReady;
   // ignore: close_sinks
   final StreamController<dynamic> _resultSC =
@@ -19,13 +25,19 @@ class Debouncing {
   // ignore: close_sinks
   final StreamController<bool> _stateSC = StreamController<bool>.broadcast();
 
+  ///  Debouncing
+  ///  Have method [debounce]
+  /// Must be closed with [close] method
   Debouncing({Duration duration = const Duration(seconds: 1)})
       : assert(duration is Duration && !duration.isNegative),
-        _duration = duration ?? Duration(seconds: 1) {
+        _duration = duration {
     _stateSC.sink.add(true);
   }
 
-  /// allows you to control events being triggered successively and, if the interval between two sequential occurrences is less than a certain amount of time (e.g. one second), it completely ignores the first one.
+  /// allows you to control events being triggered successively and,
+  /// if the interval between two sequential occurrences is less than
+  /// a certain amount of time (e.g. one second),
+  /// it completely ignores the first one.
   Future<dynamic> debounce(Function func) async {
     if (_waiter?.isActive ?? false) {
       _waiter?.cancel();
@@ -41,12 +53,32 @@ class Debouncing {
     return _resultSC.stream.first;
   }
 
-  StreamSubscription<bool> listen(Function(bool) onData) =>
-      _stateSC.stream.listen(onData);
+  @override
+  StreamSubscription<bool> listen(
+    void onData(bool event)?, {
+    Function? onError,
+    void onDone()?,
+    bool? cancelOnError,
+  }) =>
+      _stateSC.stream.listen(
+        onData,
+        onError: onError,
+        onDone: onDone,
+        cancelOnError: cancelOnError,
+      );
 
-  /// close streams
-  void dispose() {
-    _resultSC.close();
-    _stateSC.close();
-  }
+  /// Closing instances of Sink prevents
+  /// memory leaks and unexpected behavior.
+  @Deprecated('Use [close] instead')
+  void dispose() => close();
+
+  /// Shortcut for [debounce] method
+  @override
+  dynamic add(Function data) => debounce(data);
+
+  @override
+  void close() => Future.wait<void>([
+        _resultSC.close(),
+        _stateSC.close(),
+      ]);
 }

@@ -1,5 +1,3 @@
-# FORKED FROM https://github.com/PlugFox/throttling
-
 # THROTTLING DART LIBRARY
 ##### *contain "throttling" and "debouncing" classes*  
 [![pub package](https://img.shields.io/pub/v/throttling.svg)](https://pub.dev/packages/throttling)  
@@ -10,22 +8,22 @@ See demonstration of use on the [dartpad.dartlang.org](https://dartpad.dartlang.
   
 ### Throttling example
 ```dart
-final Throttling thr = new Throttling(duration: Duration(seconds: 2));
-thr.throttle(() {print(' *ping #1');});
+final thr = Throttling(duration: Duration(seconds: 2));
+thr.throttle(() {print(' * ping #1');});
 await Future.delayed(Duration(seconds: 1));
-thr.throttle(() {print(' *ping #2');});
+thr.throttle(() {print(' * ping #2');});
 await Future.delayed(Duration(seconds: 1));
-thr.throttle(() {print(' *ping #3');});
+thr.throttle(() {print(' * ping #3');});
 ```
   
 ### Debouncing example
 ```dart
-final Debouncing deb = new Debouncing(duration: Duration(seconds: 2));
-deb.debounce(() {print(' *ping #1');});
+final deb = Debouncing(duration: Duration(seconds: 2));
+deb.debounce(() {print(' * ping #1');});
 await Future.delayed(Duration(seconds: 1));
-deb.debounce(() {print(' *ping #2');});
+deb.debounce(() {print(' * ping #2');});
 await Future.delayed(Duration(seconds: 1));
-deb.debounce(() {print(' *ping #3');});
+deb.debounce(() {print(' * ping #3');});
 ```
   
   
