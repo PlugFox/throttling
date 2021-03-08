@@ -1,0 +1,31 @@
+name: throttling
+on:
+  push:
+    branches: [ master, dev ]
+  pull_request:
+    branches: [ master, dev ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: google/dart:latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: dart pub get
+      - name: Format
+        run: dart format -l 80 -o none --set-exit-if-changed .
+      - name: Run analyzer
+        run: dart analyze --fatal-infos --fatal-warnings .
+      - name: Run tests
+        run: dart pub run test_coverage --no-badge --print-test-output --min-coverage 0
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+      #- name: Check Code Coverage
+      #  uses: ChicagoFlutter/lcov-cop@v1.0.2
+      #  with:
+      #    path: coverage/lcov.info
+      #    min_coverage: 100
+      #    exclude: "**/*.g.dart"
