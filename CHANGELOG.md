@@ -1,9 +1,10 @@
-## [1.0.0-dev] - 2021.03.04  
+## [1.0.0] - 2021.03.04  
   
+* Refactoring  
 * Migrate to null safety  
-* Reference to original package  
 * Add effective dart  
-* Throttling and Debouncing extends Stream<bool>  
+* Throttling and Debouncing extends Stream<bool>
+  and implements Sink<Function>  
   
 ## [0.9.1] - 2021.02.06  
   

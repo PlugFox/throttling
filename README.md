@@ -8,22 +8,24 @@ See demonstration of use on the [dartpad.dartlang.org](https://dartpad.dartlang.
   
 ### Throttling example
 ```dart
-final thr = Throttling(duration: Duration(seconds: 2));
+final thr = Throttling(duration: const Duration(seconds: 2));
 thr.throttle(() {print(' * ping #1');});
-await Future.delayed(Duration(seconds: 1));
+await Future<void>.delayed(const Duration(seconds: 1));
 thr.throttle(() {print(' * ping #2');});
-await Future.delayed(Duration(seconds: 1));
+await Future<void>.delayed(const Duration(seconds: 1));
 thr.throttle(() {print(' * ping #3');});
+await thr.close();
 ```
   
 ### Debouncing example
 ```dart
-final deb = Debouncing(duration: Duration(seconds: 2));
+final deb = Debouncing(duration: const Duration(seconds: 2));
 deb.debounce(() {print(' * ping #1');});
-await Future.delayed(Duration(seconds: 1));
+await Future<void>.delayed(const Duration(seconds: 1));
 deb.debounce(() {print(' * ping #2');});
-await Future.delayed(Duration(seconds: 1));
+await Future<void>.delayed(const Duration(seconds: 1));
 deb.debounce(() {print(' * ping #3');});
+await deb.close();
 ```
   
   

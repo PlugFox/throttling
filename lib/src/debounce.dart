@@ -77,7 +77,7 @@ class Debouncing extends Stream<bool> implements Sink<Function> {
   dynamic add(Function data) => debounce(data);
 
   @override
-  void close() => Future.wait<void>([
+  Future<void> close() => Future.wait<void>([
         _resultSC.close(),
         _stateSC.close(),
       ]);

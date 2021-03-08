@@ -1,16 +1,17 @@
-import 'package:flutter_throttling/flutter_throttling.dart';
 import 'dart:async';
+
+import 'package:throttling/throttling.dart';
 
 abstract class Example {
   static Future<void> throttleExample() async {
     print('\n### Throttling example');
 
-    final Throttling thr = new Throttling(duration: Duration(seconds: 1));
+    final Throttling thr = Throttling(duration: Duration(seconds: 1));
     thr.duration = Duration(seconds: 3);
 
-    thr.listen((bool state) {
-      print(
-          ' *throttling#${thr.hashCode.toRadixString(36)} is ${state ? 'ready' : 'busy'}');
+    final sub = thr.listen((bool state) {
+      print(' * throttling#${thr.hashCode.toRadixString(36)} is '
+          '${state ? 'ready' : 'busy'}');
     });
 
     thr.throttle(() {
@@ -34,17 +35,19 @@ abstract class Example {
     });
 
     await Future.delayed(Duration(seconds: 3));
+    await sub.cancel();
+    await thr.close();
   }
 
   static Future<void> debounceExample() async {
     print('\n### Debouncing example');
 
-    final Debouncing deb = new Debouncing(duration: Duration(seconds: 1));
+    final deb = Debouncing(duration: Duration(seconds: 1));
     deb.duration = Duration(seconds: 3);
 
-    deb.listen((bool state) {
-      print(
-          ' *debouncing#${deb.hashCode.toRadixString(36)} is ${state ? 'ready' : 'busy'}');
+    final sub = deb.listen((bool state) {
+      print(' * debouncing#${deb.hashCode.toRadixString(36)} is '
+          '${state ? 'ready' : 'busy'}');
     });
 
     deb.debounce(() {
@@ -68,5 +71,7 @@ abstract class Example {
     });
 
     await Future.delayed(Duration(seconds: 3));
+    await sub.cancel();
+    await deb.close();
   }
 }

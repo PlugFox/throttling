@@ -70,5 +70,5 @@ class Throttling extends Stream<bool> implements Sink<Function> {
   dynamic add(Function data) => throttle(data);
 
   @override
-  void close() => _stateSC.close();
+  Future<void> close() => _stateSC.close();
 }
