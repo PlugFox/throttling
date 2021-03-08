@@ -18,7 +18,7 @@ jobs:
       - name: Run analyzer
         run: dart analyze --fatal-infos --fatal-warnings .
       - name: Run tests
-        run: dart pub run test_coverage --no-badge --print-test-output --min-coverage 0
+        run: dart run test_coverage --no-badge --print-test-output --min-coverage 0
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
         with:
