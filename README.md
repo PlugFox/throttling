@@ -1,6 +1,10 @@
 # THROTTLING DART LIBRARY
 ##### *contain "throttling" and "debouncing" classes*  
-[![pub package](https://img.shields.io/pub/v/throttling.svg)](https://pub.dev/packages/throttling)  
+[![Actions Status](https://github.com/PlugFox/throttling/workflows/throttling/badge.svg)](https://github.com/PlugFox/throttling/actions)
+[![Coverage](https://codecov.io/gh/PlugFox/throttling/branch/master/graph/badge.svg)](https://codecov.io/gh/PlugFox/throttling)
+[![Pub](https://img.shields.io/pub/v/throttling.svg)](https://pub.dev/packages/throttling)
+[![License: MIT](https://img.shields.io/badge/license-MIT-purple.svg)](https://opensource.org/licenses/MIT)
+[![effective_dart](https://img.shields.io/badge/style-effective_dart-40c4ff.svg)](https://github.com/tenhobi/effective_dart)
   
   
 ## Using  
