@@ -1,3 +1,5 @@
+# FORKED FROM https://github.com/PlugFox/throttling
+
 # THROTTLING DART LIBRARY
 ##### *contain "throttling" and "debouncing" classes*  
 [![pub package](https://img.shields.io/pub/v/throttling.svg)](https://pub.dev/packages/throttling)  

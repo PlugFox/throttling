@@ -1,3 +1,8 @@
+## [1.0.0-dev] - 2021.03.04
+
+* Migrate to null safety
+* Reference to original package
+
 ## [0.9.1] - 2021.02.06
   
 * resolve pedantic issues  
@@ -20,4 +25,3 @@
 ## [0.5.0] - 2019.06.11  
   
 * initial release.  
-  

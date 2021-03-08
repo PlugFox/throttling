@@ -1,4 +1,4 @@
-library throttling;
+library flutter_throttling;
 
 /*
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -26,5 +26,5 @@ library throttling;
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
 
-export 'package:throttling/src/throttle.dart';
-export 'package:throttling/src/debounce.dart';
+export 'package:flutter_throttling/src/throttle.dart';
+export 'package:flutter_throttling/src/debounce.dart';

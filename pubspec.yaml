@@ -1,6 +1,7 @@
 name: throttling
-description: contain "throttling" and "debouncing" async helper classes with listeners for flutter
-version: 0.9.1
+description: Contain "throttling" and "debouncing" async helper classes with listeners
+
+version: 1.0.0-dev
 homepage: https://github.com/PlugFox/throttling
 repository: https://github.com/PlugFox/throttling
 
