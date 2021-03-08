@@ -1,8 +1,9 @@
-## [1.0.0] - 2021.03.04  
+## [1.0.0] - 2021.03.08  
   
 * Refactoring  
 * Migrate to null safety  
 * Add effective dart  
+* Add badges  
 * Throttling and Debouncing extends Stream<bool>
   and implements Sink<Function>  
   
