@@ -4,7 +4,8 @@
 [![Coverage](https://codecov.io/gh/PlugFox/throttling/branch/master/graph/badge.svg)](https://codecov.io/gh/PlugFox/throttling)
 [![Pub](https://img.shields.io/pub/v/throttling.svg)](https://pub.dev/packages/throttling)
 [![License: MIT](https://img.shields.io/badge/license-MIT-purple.svg)](https://opensource.org/licenses/MIT)
-[![effective_dart](https://img.shields.io/badge/style-effective_dart-40c4ff.svg)](https://github.com/tenhobi/effective_dart)
+[![Effective Dart](https://img.shields.io/badge/style-effective_dart-40c4ff.svg)](https://github.com/tenhobi/effective_dart)
+[![Star on Github](https://img.shields.io/github/stars/plugfox/throttling.svg?style=flat&logo=github&colorB=deeppink&label=stars)](https://github.com/PlugFox/throttling)
   
   
 ## Using  
