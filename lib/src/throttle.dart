@@ -3,6 +3,14 @@ import 'dart:async';
 /// Throttling
 /// Have method [throttle]
 class Throttling extends Stream<bool> implements Sink<Function> {
+  /// Throttling
+  /// Have method [throttle]
+  /// Must be closed with [close] method
+  Throttling({Duration duration = const Duration(seconds: 1)})
+      : assert(!duration.isNegative, 'Duration must be positive'),
+        _duration = duration {
+    _stateSC.sink.add(true);
+  }
   Duration _duration;
 
   /// Get current duration
@@ -10,7 +18,7 @@ class Throttling extends Stream<bool> implements Sink<Function> {
 
   /// Set new duration
   set duration(Duration value) {
-    assert(duration is Duration && !duration.isNegative);
+    assert(!duration.isNegative, 'Duration must be positive');
     _duration = value;
   }
 
@@ -21,15 +29,6 @@ class Throttling extends Stream<bool> implements Sink<Function> {
   Future<void> get _waiter => Future.delayed(_duration);
   // ignore: close_sinks
   final StreamController<bool> _stateSC = StreamController<bool>.broadcast();
-
-  /// Throttling
-  /// Have method [throttle]
-  /// Must be closed with [close] method
-  Throttling({Duration duration = const Duration(seconds: 1)})
-      : assert(duration is Duration && !duration.isNegative),
-        _duration = duration {
-    _stateSC.sink.add(true);
-  }
 
   /// limits the maximum number of times a given
   /// event handler can be called over time
@@ -48,9 +47,10 @@ class Throttling extends Stream<bool> implements Sink<Function> {
 
   @override
   StreamSubscription<bool> listen(
-    void onData(bool event)?, {
+    // ignore: avoid_positional_boolean_parameters
+    void Function(bool event)? onData, {
     Function? onError,
-    void onDone()?,
+    void Function()? onDone,
     bool? cancelOnError,
   }) =>
       _stateSC.stream.listen(

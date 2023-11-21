@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:async';
 
 import 'package:test/test.dart';
@@ -6,21 +8,21 @@ import 'package:throttling/throttling.dart';
 void main() {
   test('Throttling', () async {
     print('# Throttling test');
-    final Throttling thr = new Throttling(duration: Duration(seconds: 1));
-    expect(thr is Throttling, true);
-    expect(thr.duration is Duration, true);
-    expect(thr.duration == Duration(seconds: 1), true);
+    final thr = Throttling(duration: const Duration(seconds: 1));
+    expect(thr, isA<Throttling>());
+    expect(thr.duration, isA<Duration>());
+    expect(thr.duration, equals(const Duration(seconds: 1)));
 
-    thr.duration = Duration(seconds: 3);
-    expect(thr.duration == Duration(seconds: 3), true);
+    thr.duration = const Duration(seconds: 3);
+    expect(thr.duration == const Duration(seconds: 3), true);
 
-    int numberOfAllStates = 0;
-    int numberOfReadyStates = 0;
-    int numberOfBusyStates = 0;
-    StreamSubscription<bool> subscription = thr.listen((bool state) {
-      expect(state is bool, true);
-      print(
-          ' *throttling#${thr.hashCode.toRadixString(36)} is ${state ? 'ready' : 'busy'}');
+    var numberOfAllStates = 0;
+    var numberOfReadyStates = 0;
+    var numberOfBusyStates = 0;
+    var subscription = thr.listen((state) {
+      expect(state, isTrue);
+      print(' *throttling#${thr.hashCode.toRadixString(36)}'
+          ' is ${state ? 'ready' : 'busy'}');
       numberOfAllStates++;
       if (state) {
         numberOfReadyStates++;
@@ -31,7 +33,7 @@ void main() {
 
     dynamic result;
     Future<void> pause([int sec = 1]) =>
-        Future.delayed(Duration(seconds: sec)).whenComplete(() => null);
+        Future<void>.delayed(Duration(seconds: sec)).whenComplete(() => null);
 
     result = thr.throttle(() {
       print('. 1');
@@ -68,29 +70,29 @@ void main() {
     expect(result, null);
     await pause();
 
-    subscription.cancel();
+    await subscription.cancel();
     expect(numberOfAllStates, 3);
     expect(numberOfReadyStates, 1);
     expect(numberOfBusyStates, 2);
-  }, timeout: Timeout(Duration(seconds: 7)));
+  }, timeout: const Timeout(Duration(seconds: 7)));
 
   test('Debouncing', () async {
     print('# Debouncing test');
-    final Debouncing deb = new Debouncing(duration: Duration(seconds: 1));
-    expect(deb is Debouncing, true);
-    expect(deb.duration is Duration, true);
+    final deb = Debouncing(duration: const Duration(seconds: 1));
+    expect(deb, isA<Debouncing>());
+    expect(deb.duration, isA<Duration>());
     expect(deb.duration, const Duration(seconds: 1));
 
-    deb.duration = Duration(seconds: 3);
+    deb.duration = const Duration(seconds: 3);
     expect(deb.duration, const Duration(seconds: 3));
 
-    int numberOfAllStates = 0;
-    int numberOfReadyStates = 0;
-    int numberOfBusyStates = 0;
-    StreamSubscription<bool> subscription = deb.listen((bool state) {
-      expect(state is bool, true);
-      print(
-          ' *debouncing#${deb.hashCode.toRadixString(36)} is ${state ? 'ready' : 'busy'}');
+    var numberOfAllStates = 0;
+    var numberOfReadyStates = 0;
+    var numberOfBusyStates = 0;
+    var subscription = deb.listen((state) {
+      expect(state, isTrue);
+      print(' *debouncing#${deb.hashCode.toRadixString(36)}'
+          ' is ${state ? 'ready' : 'busy'}');
       numberOfAllStates++;
       if (state) {
         numberOfReadyStates++;
@@ -101,14 +103,14 @@ void main() {
 
     Future<dynamic> result;
     Future<void> pause([int sec = 1]) =>
-        Future.delayed(Duration(seconds: sec)).whenComplete(() => null);
+        Future<void>.delayed(Duration(seconds: sec)).whenComplete(() => null);
 
     result = deb.debounce(() {
       print('. 1');
       return 1;
     });
     await pause();
-    result.then((dynamic value) {
+    await result.then((value) {
       expect(value, null);
     });
 
@@ -117,7 +119,7 @@ void main() {
       return 2;
     });
     await pause();
-    result.then((dynamic value) {
+    await result.then((value) {
       expect(value, null);
     });
 
@@ -126,13 +128,13 @@ void main() {
       return 3;
     });
     await pause(4);
-    result.then((dynamic value) {
+    await result.then((value) {
       expect(value, 3);
     });
 
-    subscription.cancel();
+    await subscription.cancel();
     expect(numberOfAllStates, 4);
     expect(numberOfReadyStates, 1);
     expect(numberOfBusyStates, 3);
-  }, timeout: Timeout(Duration(seconds: 7)));
+  }, timeout: const Timeout(Duration(seconds: 7)));
 }
