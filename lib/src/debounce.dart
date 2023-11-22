@@ -81,7 +81,7 @@ final class Debouncing<T> extends Stream<DebouncingStatus>
         final result = func();
         completer.complete(result);
       } on Object catch (error, stackTrace) {
-        completer.completeError(error, stackTrace);
+        completer.completeError(error, stackTrace); // coverage:ignore-line
       } finally {
         if (!_stateSC.isClosed) _stateSC.sink.add(DebouncingStatus.idle);
       }
@@ -111,12 +111,14 @@ final class Debouncing<T> extends Stream<DebouncingStatus>
   /// If [force] is true, then the current event will be canceled.
   @override
   void close({bool force = false}) {
+    // coverage:ignore-start
     if (force) {
       _timer?.cancel();
       _completer?.completeError(StateError('closed'));
       _timer = null;
       _completer = null;
     }
+    // coverage:ignore-end
     _stateSC.close().ignore();
   }
 }

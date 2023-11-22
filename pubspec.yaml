@@ -4,6 +4,27 @@ description: Contain "throttling" and "debouncing" async helper classes with lis
 version: 2.0.0-dev.1
 homepage: https://github.com/PlugFox/throttling
 repository: https://github.com/PlugFox/throttling
+issue_tracker: https://github.com/PlugFox/throttling/issues
+
+funding:
+  - https://www.buymeacoffee.com/plugfox
+  - https://www.patreon.com/plugfox
+  - https://boosty.to/plugfox
+
+topics:
+  - throttling
+  - debouncing
+  - throttle
+  - debounce
+  - async
+
+platforms:
+  android:
+  ios:
+  linux:
+  macos:
+  web:
+  windows:
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
