@@ -15,6 +15,12 @@ enum ThrottlingStatus {
 
   /// Waiting for the end of the pause
   bool get isBusy => this == ThrottlingStatus.busy;
+
+  @override
+  String toString() => switch (this) {
+        ThrottlingStatus.idle => 'idle',
+        ThrottlingStatus.busy => 'busy',
+      };
 }
 
 /// Throttling
@@ -40,10 +46,19 @@ final class Throttling<T> extends Stream<ThrottlingStatus>
     _duration = value;
   }
 
-  /// Is ready to accept new events
-  bool get isReady => _isReady;
-  bool _isReady = true;
+  /// {@nodoc}
+  Timer? _timer;
 
+  /// Is ready to accept new events
+  bool get isIdle => switch (_timer?.isActive) {
+        true => false,
+        _ => true,
+      };
+
+  /// Waiting for the end of the pause
+  bool get isBusy => !isIdle;
+
+  /// {@nodoc}
   final StreamController<ThrottlingStatus> _stateSC =
       StreamController<ThrottlingStatus>.broadcast(sync: true);
 
@@ -54,20 +69,22 @@ final class Throttling<T> extends Stream<ThrottlingStatus>
   /// If the function is not ready to accept new events,
   /// it returns null.
   T? throttle(T Function() func) {
-    if (!_isReady) return null;
-    _isReady = false;
-    _stateSC.sink.add(ThrottlingStatus.busy);
-    Timer(_duration, () {
-      _isReady = true;
+    if (_stateSC.isClosed || !isIdle) return null;
+    _timer = Timer(_duration, () {
+      _timer = null;
       if (_stateSC.isClosed) return;
       _stateSC.sink.add(ThrottlingStatus.idle);
     });
-    return func();
+    _stateSC.sink.add(ThrottlingStatus.busy);
+    try {
+      return func();
+    } on Object {
+      rethrow;
+    }
   }
 
   @override
   StreamSubscription<ThrottlingStatus> listen(
-    // ignore: avoid_positional_boolean_parameters
     void Function(ThrottlingStatus status)? onData, {
     Function? onError,
     void Function()? onDone,
@@ -85,5 +102,9 @@ final class Throttling<T> extends Stream<ThrottlingStatus>
   T? add(T Function() data) => throttle(data);
 
   @override
-  void close() => _stateSC.close().ignore();
+  void close() {
+    _timer?.cancel();
+    _timer = null;
+    _stateSC.close().ignore();
+  }
 }

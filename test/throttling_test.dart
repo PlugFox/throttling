@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, cascade_invocations
 
 import 'dart:async';
 
@@ -7,20 +7,18 @@ import 'package:throttling/throttling.dart';
 
 void main() => group('unit', () {
       const defaultDuration = Duration(milliseconds: 50);
-      late Throttling<int> thr;
-      late Debouncing<int> deb;
-
-      setUp(() {
-        thr = Throttling<int>(duration: defaultDuration);
-        deb = Debouncing<int>(duration: defaultDuration);
-      });
-
-      tearDown(() {
-        thr.close();
-        deb.close();
-      });
 
       group('throttling', () {
+        late Throttling<int> thr;
+
+        setUp(() {
+          thr = Throttling<int>(duration: defaultDuration);
+        });
+
+        tearDown(() {
+          thr.close();
+        });
+
         test('constructor', () {
           expect(() => Throttling<int>(duration: const Duration(seconds: 1)),
               returnsNormally);
@@ -35,6 +33,19 @@ void main() => group('unit', () {
         test('setter', () {
           thr.duration = const Duration(milliseconds: 100);
           expect(thr.duration, equals(const Duration(milliseconds: 100)));
+        });
+
+        test('status', () {
+          expect(thr.isIdle, isTrue);
+          expect(thr.isBusy, isFalse);
+          expect(ThrottlingStatus.idle.isIdle, isTrue);
+          expect(ThrottlingStatus.busy.isBusy, isTrue);
+          expect(ThrottlingStatus.idle.toString, returnsNormally);
+          expect(ThrottlingStatus.busy.toString, returnsNormally);
+        });
+
+        test('close', () {
+          expect(() => thr.close(), returnsNormally);
         });
 
         test('1', () {
@@ -68,109 +79,196 @@ void main() => group('unit', () {
           expect(result, equals(3));
         });
 
-        test('subscribe', () async {
-          // Initial state is idle
-          var idle = 1, busy = 0, total = 1;
-          final subscription = thr.listen((status) {
-            total++;
-            if (status.isIdle)
-              idle++;
-            else
-              busy++;
+        test(
+          'subscribe',
+          () async {
+            // Initial state is idle
+            var idle = 1, busy = 0, total = 1;
+            final subscription = thr.listen((status) {
+              total++;
+              if (status.isIdle)
+                idle++;
+              else
+                busy++;
+            });
+
+            unawaited(
+              expectLater(
+                  thr,
+                  emitsInOrder(<Object>[
+                    ThrottlingStatus.busy,
+                    ThrottlingStatus.idle,
+                    ThrottlingStatus.busy,
+                    ThrottlingStatus.idle,
+                    emitsDone
+                  ])),
+            );
+
+            thr.add(() => 1);
+            await Future<void>.delayed(thr.duration ~/ 2);
+            thr.add(() => 2);
+            await Future<void>.delayed(thr.duration ~/ 2);
+            thr.add(() => 3);
+            await Future<void>.delayed(thr.duration);
+
+            expect(idle, equals(3), reason: 'idle');
+            expect(busy, equals(2), reason: 'busy');
+            expect(total, equals(5), reason: 'total');
+
+            await expectLater(subscription.cancel(), completes);
+            thr.close();
+          },
+          timeout: const Timeout(Duration(seconds: 5)),
+        );
+
+        test('example', () async {
+          final thr =
+              Throttling<void>(duration: const Duration(milliseconds: 200));
+          thr.throttle(() {
+            /* print(' * 1'); */
           });
-
-          unawaited(
-            expectLater(
-                thr,
-                emitsInOrder(<Object>[
-                  ThrottlingStatus.busy,
-                  ThrottlingStatus.idle,
-                  ThrottlingStatus.busy,
-                  ThrottlingStatus.idle,
-                  emitsDone
-                ])),
-          );
-
-          // Idle
-          thr.throttle(() => 1);
-          // Busy
-          await Future<void>.delayed(thr.duration ~/ 2);
-          thr.throttle(() => 2); // Still busy
-          await Future<void>.delayed(thr.duration ~/ 2);
-          // Idle
-          thr.throttle(() => 3);
-          // Busy
-          await Future<void>.delayed(thr.duration);
-          // Idle
-
-          expect(idle, equals(3), reason: 'idle');
-          expect(busy, equals(2), reason: 'busy');
-          expect(total, equals(5), reason: 'total');
-
-          await expectLater(subscription.cancel(), completes);
+          await Future<void>.delayed(const Duration(milliseconds: 100));
+          thr.throttle(() {
+            /* print(' * 2'); */
+          });
+          await Future<void>.delayed(const Duration(milliseconds: 100));
+          thr.throttle(() {
+            /* print(' * 3'); */
+          });
           thr.close();
         });
       });
 
-      /*
-      test('Debouncing', () async {
-        print('# Debouncing test');
-        expect(deb, isA<Debouncing<int>>());
-        expect(deb.duration, isA<Duration>());
-        expect(deb.duration, defaultDuration);
+      group('debouncing', () {
+        late Debouncing<int> deb;
 
-        deb.duration = const Duration(milliseconds: 100);
-        expect(deb.duration, equals(const Duration(milliseconds: 100)));
-
-        var numberOfAllStates = 0;
-        var numberOfReadyStates = 0;
-        var numberOfBusyStates = 0;
-        var subscription = deb.listen((state) {
-          expect(state, isTrue);
-          print(' *debouncing#${deb.hashCode.toRadixString(36)}'
-              ' is ${state ? 'ready' : 'busy'}');
-          numberOfAllStates++;
-          if (state) {
-            numberOfReadyStates++;
-          } else {
-            numberOfBusyStates++;
-          }
+        setUp(() {
+          deb = Debouncing<int>(duration: defaultDuration);
         });
 
-        Future<dynamic> result;
-        Future<void> pause([int ms = 25]) =>
-            Future<void>.delayed(Duration(milliseconds: ms));
-
-        result = deb.debounce(() {
-          print('. 1');
-          return 1;
-        });
-        await pause();
-        await result.then((value) {
-          expect(value, null);
+        tearDown(() {
+          deb.close();
         });
 
-        result = deb.debounce(() {
-          print('. 2');
-          return 2;
-        });
-        await pause();
-        await result.then((value) {
-          expect(value, null);
+        test('constructor', () {
+          expect(() => Debouncing<int>(duration: const Duration(seconds: 1)),
+              returnsNormally);
         });
 
-        result = deb.debounce(() {
-          print('. 3');
-          return 3;
-        });
-        await pause(4);
-        await result.then((value) {
-          expect(value, 3);
+        test('types', () {
+          expect(deb, isA<Debouncing<int>>());
+          expect(deb.duration, isA<Duration>());
+          expect(deb.duration, equals(defaultDuration));
         });
 
-        await subscription.cancel();
-        expect(numberOfAllStates, 4);
-        expect(numberOfReadyStates, 1);
-        expect(numberOfBusyStates, 3);
-      }, timeout: const Timeout(Duration(seconds: 7))); */
+        test('setter', () {
+          deb.duration = const Duration(milliseconds: 100);
+          expect(deb.duration, equals(const Duration(milliseconds: 100)));
+        });
+
+        test('status', () {
+          expect(deb.isIdle, isTrue);
+          expect(deb.isBusy, isFalse);
+          expect(DebouncingStatus.idle.isIdle, isTrue);
+          expect(DebouncingStatus.busy.isBusy, isTrue);
+          expect(DebouncingStatus.idle.toString, returnsNormally);
+          expect(DebouncingStatus.busy.toString, returnsNormally);
+        });
+
+        test('close', () {
+          expect(() => deb.close(), returnsNormally);
+        });
+
+        test('1', () {
+          final result = deb.debounce(() => 1);
+          expectLater(result, completion(equals(1)));
+        });
+
+        test('1 -> 2', () {
+          var result = deb.debounce(() => 1);
+          expectLater(result, completion(equals(2)));
+          result = deb.debounce(() => 2);
+          expectLater(result, completion(equals(2)));
+        });
+
+        test('1 -> pause -> 2', () async {
+          var result = deb.debounce(() => 1);
+          unawaited(expectLater(result, completion(equals(1))));
+          await Future<void>.delayed(deb.duration);
+          result = deb.debounce(() => 2);
+          unawaited(expectLater(result, completion(equals(2))));
+        });
+
+        test('1 -> pause/2 -> 2 -> pause/2 -> 3', () async {
+          var result = deb.debounce(() => 1);
+          unawaited(expectLater(result, completion(equals(3))));
+          await Future<void>.delayed(deb.duration ~/ 2);
+          result = deb.debounce(() => 2);
+          unawaited(expectLater(result, completion(equals(3))));
+          await Future<void>.delayed(deb.duration ~/ 2);
+          result = deb.debounce(() => 3);
+          unawaited(expectLater(result, completion(equals(3))));
+        });
+
+        test(
+          'subscribe',
+          () async {
+            // Initial state is idle
+            var idle = 1, busy = 0, total = 1;
+            final subscription = deb.listen((status) {
+              total++;
+              if (status.isIdle)
+                idle++;
+              else
+                busy++;
+            });
+
+            unawaited(
+              expectLater(
+                  deb,
+                  emitsInOrder(<Object>[
+                    DebouncingStatus.busy,
+                    DebouncingStatus.idle,
+                    DebouncingStatus.busy,
+                    DebouncingStatus.idle,
+                    emitsDone
+                  ])),
+            );
+
+            await expectLater(deb.add(() => 1), completion(equals(1)));
+            unawaited(expectLater(deb.add(() => 2), completion(equals(3))));
+            await Future<void>.delayed(deb.duration ~/ 2);
+            await expectLater(deb.add(() => 3), completion(equals(3)));
+
+            expect(idle, equals(3), reason: 'idle');
+            expect(busy, equals(2), reason: 'busy');
+            expect(total, equals(5), reason: 'total');
+
+            await expectLater(subscription.cancel(), completes);
+            deb.close();
+          },
+          timeout: const Timeout(Duration(seconds: 5)),
+        );
+
+        test('example', () async {
+          final deb =
+              Debouncing<void>(duration: const Duration(milliseconds: 200));
+          // ignore: unawaited_futures
+          deb.debounce(() {
+            /* print(' * 1'); */
+          });
+          await Future<void>.delayed(const Duration(milliseconds: 100));
+          // ignore: unawaited_futures
+          deb.debounce(() {
+            /* print(' * 2'); */
+          });
+          await Future<void>.delayed(const Duration(milliseconds: 100));
+          // ignore: unawaited_futures
+          deb.debounce(() {
+            /* print(' * 3'); */
+          });
+          await Future<void>.delayed(const Duration(milliseconds: 200));
+          deb.close();
+        });
+      });
     });

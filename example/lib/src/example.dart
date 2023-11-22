@@ -6,72 +6,69 @@ abstract class Example {
   static Future<void> throttleExample() async {
     print('\n### Throttling example');
 
-    final Throttling thr = Throttling(duration: Duration(seconds: 1));
-    thr.duration = Duration(seconds: 3);
+    final thr = Throttling<void>(duration: const Duration(milliseconds: 300));
 
-    final sub = thr.listen((bool state) {
-      print(' * throttling#${thr.hashCode.toRadixString(36)} is '
-          '${state ? 'ready' : 'busy'}');
+    final sub = thr.listen((state) {
+      print(' * throttling is '
+          '${state.isIdle ? 'ready' : 'busy'}');
     });
 
     thr.throttle(() {
       print('. 1');
     });
-    await Future.delayed(Duration(seconds: 1));
+    await Future<void>.delayed(const Duration(milliseconds: 100));
     thr.throttle(() {
       print('. 2');
     });
-    await Future.delayed(Duration(seconds: 1));
+    await Future<void>.delayed(const Duration(milliseconds: 100));
     thr.throttle(() {
       print('. 3');
     });
-    await Future.delayed(Duration(seconds: 1));
+    await Future<void>.delayed(const Duration(milliseconds: 100));
     thr.throttle(() {
       print('. 4');
     });
-    await Future.delayed(Duration(seconds: 1));
+    await Future<void>.delayed(const Duration(milliseconds: 100));
     thr.throttle(() {
       print('. 5');
     });
-
-    await Future.delayed(Duration(seconds: 3));
+    await Future<void>.delayed(const Duration(milliseconds: 100));
     await sub.cancel();
-    await thr.close();
+    thr.close();
   }
 
   static Future<void> debounceExample() async {
     print('\n### Debouncing example');
 
-    final deb = Debouncing(duration: Duration(seconds: 1));
-    deb.duration = Duration(seconds: 3);
+    final deb = Debouncing<void>(duration: const Duration(milliseconds: 300));
 
-    final sub = deb.listen((bool state) {
-      print(' * debouncing#${deb.hashCode.toRadixString(36)} is '
-          '${state ? 'ready' : 'busy'}');
+    final sub = deb.listen((status) {
+      print(' * debouncing is '
+          '${status.isIdle ? 'ready' : 'busy'}');
     });
 
-    deb.debounce(() {
+    await deb.debounce(() {
       print('. 1');
     });
-    await Future.delayed(Duration(seconds: 1));
-    deb.debounce(() {
+    await Future<void>.delayed(const Duration(milliseconds: 100));
+    await deb.debounce(() {
       print('. 2');
     });
-    await Future.delayed(Duration(seconds: 1));
-    deb.debounce(() {
+    await Future<void>.delayed(const Duration(milliseconds: 100));
+    await deb.debounce(() {
       print('. 3');
     });
-    await Future.delayed(Duration(seconds: 1));
-    deb.debounce(() {
+    await Future<void>.delayed(const Duration(milliseconds: 100));
+    await deb.debounce(() {
       print('. 4');
     });
-    await Future.delayed(Duration(seconds: 1));
-    deb.debounce(() {
+    await Future<void>.delayed(const Duration(milliseconds: 100));
+    await deb.debounce(() {
       print('. 5');
     });
 
-    await Future.delayed(Duration(seconds: 3));
+    await Future<void>.delayed(const Duration(milliseconds: 100));
     await sub.cancel();
-    await deb.close();
+    deb.close();
   }
 }

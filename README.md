@@ -16,23 +16,25 @@ See a demonstration of use on [dartpad.dartlang.org](https://dartpad.dartlang.or
 ### Throttling example
 
 ```dart
-final thr = Throttling(duration: const Duration(seconds: 2));
-thr.throttle(() {print(' * ping #1');});
-await Future<void>.delayed(const Duration(seconds: 1));
-thr.throttle(() {print(' * ping #2');});
-await Future<void>.delayed(const Duration(seconds: 1));
-thr.throttle(() {print(' * ping #3');});
-await thr.close();
+final thr = Throttling<void>(duration: const Duration(milliseconds: 200));
+thr.throttle(() {print(' * 1');}); // print ' * 1'
+await Future<void>.delayed(const Duration(milliseconds: 100));
+thr.throttle(() {print(' * 2');});
+await Future<void>.delayed(const Duration(milliseconds: 100));
+thr.throttle(() {print(' * 3');}); // print ' * 3'
+thr.close();
 ```
 
 ### Debouncing example
 
 ```dart
-final deb = Debouncing(duration: const Duration(seconds: 2));
-deb.debounce(() {print(' * ping #1');});
-await Future<void>.delayed(const Duration(seconds: 1));
-deb.debounce(() {print(' * ping #2');});
-await Future<void>.delayed(const Duration(seconds: 1));
-deb.debounce(() {print(' * ping #3');});
-await deb.close();
+final deb = Debouncing<void>(duration: const Duration(milliseconds: 200));
+deb.debounce(() {print(' * 1');});
+await Future<void>.delayed(const Duration(milliseconds: 100));
+deb.debounce(() {print(' * 2');});
+await Future<void>.delayed(const Duration(milliseconds: 100));
+deb.debounce(() {print(' * 3');});
+await Future<void>.delayed(const Duration(milliseconds: 200));
+// print ' * 3'
+deb.close();
 ```

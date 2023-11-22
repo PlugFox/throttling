@@ -15,6 +15,12 @@ enum DebouncingStatus {
 
   /// Waiting for the end of the pause
   bool get isBusy => this == DebouncingStatus.busy;
+
+  @override
+  String toString() => switch (this) {
+        DebouncingStatus.idle => 'idle',
+        DebouncingStatus.busy => 'busy',
+      };
 }
 
 /// Debouncing
@@ -40,13 +46,21 @@ final class Debouncing<T> extends Stream<DebouncingStatus>
     _duration = value;
   }
 
-  Timer? _waiter;
-  bool _isReady = true;
+  /// {@nodoc}
+  Timer? _timer;
 
-  /// is ready
-  bool get isReady => _isReady;
-  // ignore: close_sinks
-  final StreamController<T?> _resultSC = StreamController<T?>.broadcast();
+  /// {@nodoc}
+  Completer<T?>? _completer;
+
+  /// Is ready to accept new events
+  bool get isIdle => switch (_timer?.isActive) {
+        true => false,
+        _ => true,
+      };
+
+  /// Waiting for the end of the pause
+  bool get isBusy => !isIdle;
+
   // ignore: close_sinks
   final StreamController<DebouncingStatus> _stateSC =
       StreamController<DebouncingStatus>.broadcast(sync: true);
@@ -56,23 +70,26 @@ final class Debouncing<T> extends Stream<DebouncingStatus>
   /// a certain amount of time (e.g. one second),
   /// it completely ignores the first one.
   Future<T?> debounce(T Function() func) async {
-    if (_waiter?.isActive ?? false) {
-      _waiter?.cancel();
-      _resultSC.sink.add(null);
-    }
-    _isReady = false;
-    _stateSC.sink.add(DebouncingStatus.busy);
-    _waiter = Timer(_duration, () {
-      _isReady = true;
-      _stateSC.sink.add(DebouncingStatus.idle);
-      _resultSC.sink.add(func());
+    if (_stateSC.isClosed) return null;
+    if (isIdle) _stateSC.sink.add(DebouncingStatus.busy);
+    final completer = _completer ??= Completer<T?>();
+    _timer?.cancel();
+    _timer = Timer(_duration, () {
+      _completer = null;
+      _timer = null;
+      if (!_stateSC.isClosed) _stateSC.sink.add(DebouncingStatus.idle);
+      try {
+        final result = func();
+        completer.complete(result);
+      } on Object catch (error, stackTrace) {
+        completer.completeError(error, stackTrace);
+      }
     });
-    return _resultSC.stream.first;
+    return completer.future;
   }
 
   @override
   StreamSubscription<DebouncingStatus> listen(
-    // ignore: avoid_positional_boolean_parameters
     void Function(DebouncingStatus status)? onData, {
     Function? onError,
     void Function()? onDone,
@@ -85,18 +102,20 @@ final class Debouncing<T> extends Stream<DebouncingStatus>
         cancelOnError: cancelOnError,
       );
 
-  /// Closing instances of Sink prevents
-  /// memory leaks and unexpected behavior.
-  @Deprecated('Use [close] instead')
-  void dispose() => close();
-
   /// Shortcut for [debounce] method
   @override
   Future<T?> add(T Function() data) => debounce(data);
 
+  /// Free resources
+  /// If [force] is true, then the current event will be canceled.
   @override
-  void close() {
-    _resultSC.close().ignore();
+  void close({bool force = false}) {
+    if (force) {
+      _timer?.cancel();
+      _completer?.completeError(StateError('closed'));
+      _timer = null;
+      _completer = null;
+    }
     _stateSC.close().ignore();
   }
 }
