@@ -1,4 +1,4 @@
-## 2.0.0-dev.1
+## 2.0.0
 
 - Migrate to Dart 3.0
 - Refactoring
