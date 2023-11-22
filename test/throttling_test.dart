@@ -69,35 +69,46 @@ void main() => group('unit', () {
         });
 
         test('subscribe', () async {
+          // Initial state is idle
           var idle = 1, busy = 0, total = 1;
           final subscription = thr.listen((status) {
-            print(status);
             total++;
-            if (status == ThrottlingStatus.idle) {
+            if (status.isIdle)
               idle++;
-            } else {
+            else
               busy++;
-            }
           });
 
-          /* unawaited(
+          unawaited(
             expectLater(
-                thr, emitsInOrder(<Object>[true, false, true, emitsDone])),
-          ); */
+                thr,
+                emitsInOrder(<Object>[
+                  ThrottlingStatus.busy,
+                  ThrottlingStatus.idle,
+                  ThrottlingStatus.busy,
+                  ThrottlingStatus.idle,
+                  emitsDone
+                ])),
+          );
 
           // Idle
           thr.throttle(() => 1);
           // Busy
           await Future<void>.delayed(thr.duration ~/ 2);
-          thr.throttle(() => 2);
+          thr.throttle(() => 2); // Still busy
           await Future<void>.delayed(thr.duration ~/ 2);
+          // Idle
           thr.throttle(() => 3);
+          // Busy
+          await Future<void>.delayed(thr.duration);
+          // Idle
 
-          expect(idle, equals(2), reason: 'idle');
+          expect(idle, equals(3), reason: 'idle');
           expect(busy, equals(2), reason: 'busy');
-          expect(total, equals(4), reason: 'total');
+          expect(total, equals(5), reason: 'total');
 
-          await expectLater(subscription.cancel, completes);
+          await expectLater(subscription.cancel(), completes);
+          thr.close();
         });
       });
 

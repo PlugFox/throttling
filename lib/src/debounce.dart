@@ -6,12 +6,20 @@ enum DebouncingStatus {
   idle,
 
   /// Waiting for the end of the pause
-  busy,
+  busy;
+
+  const DebouncingStatus();
+
+  /// Ready to accept new events
+  bool get isIdle => this == DebouncingStatus.idle;
+
+  /// Waiting for the end of the pause
+  bool get isBusy => this == DebouncingStatus.busy;
 }
 
 /// Debouncing
 /// Have method [debounce]
-class Debouncing<T> extends Stream<DebouncingStatus>
+final class Debouncing<T> extends Stream<DebouncingStatus>
     implements Sink<T Function()> {
   ///  Debouncing
   ///  Have method [debounce]
@@ -87,8 +95,8 @@ class Debouncing<T> extends Stream<DebouncingStatus>
   Future<T?> add(T Function() data) => debounce(data);
 
   @override
-  Future<void> close() => Future.wait<void>([
-        _resultSC.close(),
-        _stateSC.close(),
-      ]);
+  void close() {
+    _resultSC.close().ignore();
+    _stateSC.close().ignore();
+  }
 }

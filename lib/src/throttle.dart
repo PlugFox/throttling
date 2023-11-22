@@ -6,12 +6,20 @@ enum ThrottlingStatus {
   idle,
 
   /// Waiting for the end of the pause
-  busy,
+  busy;
+
+  const ThrottlingStatus();
+
+  /// Ready to accept new events
+  bool get isIdle => this == ThrottlingStatus.idle;
+
+  /// Waiting for the end of the pause
+  bool get isBusy => this == ThrottlingStatus.busy;
 }
 
 /// Throttling
 /// Have method [throttle]
-class Throttling<T> extends Stream<ThrottlingStatus>
+final class Throttling<T> extends Stream<ThrottlingStatus>
     implements Sink<T Function()> {
   /// Throttling
   /// Have method [throttle]
@@ -32,26 +40,27 @@ class Throttling<T> extends Stream<ThrottlingStatus>
     _duration = value;
   }
 
+  /// Is ready to accept new events
+  bool get isReady => _isReady;
   bool _isReady = true;
 
-  /// is ready
-  bool get isReady => _isReady;
-  Future<void> get _waiter => Future.delayed(_duration);
-  // ignore: close_sinks
   final StreamController<ThrottlingStatus> _stateSC =
       StreamController<ThrottlingStatus>.broadcast(sync: true);
 
   /// Limits the maximum number of times a given
-  /// event handler can be called over time
+  /// event handler can be called over time.
+  ///
+  /// Returns the result of the function.
+  /// If the function is not ready to accept new events,
+  /// it returns null.
   T? throttle(T Function() func) {
     if (!_isReady) return null;
-    _stateSC.sink.add(ThrottlingStatus.busy);
     _isReady = false;
-    _waiter.then((_) {
+    _stateSC.sink.add(ThrottlingStatus.busy);
+    Timer(_duration, () {
       _isReady = true;
-      if (!_stateSC.isClosed) {
-        _stateSC.sink.add(ThrottlingStatus.idle);
-      }
+      if (_stateSC.isClosed) return;
+      _stateSC.sink.add(ThrottlingStatus.idle);
     });
     return func();
   }
@@ -71,15 +80,10 @@ class Throttling<T> extends Stream<ThrottlingStatus>
         cancelOnError: cancelOnError,
       );
 
-  /// Closing instances of Sink prevents
-  /// memory leaks and unexpected behavior.
-  @Deprecated('Use [close] instead')
-  void dispose() => close();
-
   /// Shortcut for [throttle] method
   @override
   T? add(T Function() data) => throttle(data);
 
   @override
-  Future<void> close() => _stateSC.close();
+  void close() => _stateSC.close().ignore();
 }
