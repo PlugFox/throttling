@@ -2,7 +2,7 @@
 
 ##### _contain "throttling" and "debouncing" classes_
 
-[![Actions Status](https://github.com/PlugFox/throttling/workflows/throttling/badge.svg)](https://github.com/PlugFox/throttling/actions)
+[![Actions Status](https://github.com/PlugFox/throttling/workflows/checkout/badge.svg)](https://github.com/PlugFox/throttling/actions)
 [![Coverage](https://codecov.io/gh/PlugFox/throttling/branch/master/graph/badge.svg)](https://codecov.io/gh/PlugFox/throttling)
 [![Pub](https://img.shields.io/pub/v/throttling.svg)](https://pub.dev/packages/throttling)
 [![License: MIT](https://img.shields.io/badge/license-MIT-purple.svg)](https://opensource.org/licenses/MIT)
@@ -11,7 +11,7 @@
 
 ## Using
 
-See a demonstration of use on [dartpad.dartlang.org](https://dartpad.dartlang.org/8630021e5c7ab9d27b74e86372f74c31)
+See a demonstration of use at [dartpad.dev](https://dartpad.dev/?id=8630021e5c7ab9d27b74e86372f74c31)
 
 ### Throttling example
 
