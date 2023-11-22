@@ -1,8 +1,10 @@
+// ignore_for_file: avoid_print, avoid_classes_with_only_static_members, unawaited_futures
+
 import 'dart:async';
 
 import 'package:throttling/throttling.dart';
 
-abstract class Example {
+abstract final class Example {
   static Future<void> throttleExample() async {
     print('\n### Throttling example');
 
@@ -47,27 +49,28 @@ abstract class Example {
           '${status.isIdle ? 'ready' : 'busy'}');
     });
 
-    await deb.debounce(() {
+    deb.debounce(() {
       print('. 1');
     });
     await Future<void>.delayed(const Duration(milliseconds: 100));
-    await deb.debounce(() {
+    deb.debounce(() {
       print('. 2');
     });
     await Future<void>.delayed(const Duration(milliseconds: 100));
-    await deb.debounce(() {
+    deb.debounce(() {
       print('. 3');
     });
-    await Future<void>.delayed(const Duration(milliseconds: 100));
-    await deb.debounce(() {
+
+    await Future<void>.delayed(const Duration(milliseconds: 300));
+    deb.debounce(() {
       print('. 4');
     });
     await Future<void>.delayed(const Duration(milliseconds: 100));
-    await deb.debounce(() {
+    deb.debounce(() {
       print('. 5');
     });
 
-    await Future<void>.delayed(const Duration(milliseconds: 100));
+    await Future<void>.delayed(const Duration(milliseconds: 300));
     await sub.cancel();
     deb.close();
   }

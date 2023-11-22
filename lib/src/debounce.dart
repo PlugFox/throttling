@@ -77,12 +77,13 @@ final class Debouncing<T> extends Stream<DebouncingStatus>
     _timer = Timer(_duration, () {
       _completer = null;
       _timer = null;
-      if (!_stateSC.isClosed) _stateSC.sink.add(DebouncingStatus.idle);
       try {
         final result = func();
         completer.complete(result);
       } on Object catch (error, stackTrace) {
         completer.completeError(error, stackTrace);
+      } finally {
+        if (!_stateSC.isClosed) _stateSC.sink.add(DebouncingStatus.idle);
       }
     });
     return completer.future;

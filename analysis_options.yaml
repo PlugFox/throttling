@@ -5,7 +5,7 @@ analyzer:
     # Build
     - "build/**"
     # Test
-    - "example/**"
+    #- "example/**"
     # Tests
     - "test/**.mocks.dart"
     - ".test_coverage.dart"
