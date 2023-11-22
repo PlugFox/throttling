@@ -1,8 +1,40 @@
 import 'dart:async';
 
+/// Throttling status
+enum ThrottlingStatus {
+  /// Ready to accept new events
+  idle,
+
+  /// Waiting for the end of the pause
+  busy;
+
+  const ThrottlingStatus();
+
+  /// Ready to accept new events
+  bool get isIdle => this == ThrottlingStatus.idle;
+
+  /// Waiting for the end of the pause
+  bool get isBusy => this == ThrottlingStatus.busy;
+
+  @override
+  String toString() => switch (this) {
+        ThrottlingStatus.idle => 'idle',
+        ThrottlingStatus.busy => 'busy',
+      };
+}
+
 /// Throttling
 /// Have method [throttle]
-class Throttling extends Stream<bool> implements Sink<Function> {
+final class Throttling<T> extends Stream<ThrottlingStatus>
+    implements Sink<T Function()> {
+  /// Throttling
+  /// Have method [throttle]
+  /// Must be closed with [close] method
+  Throttling({Duration duration = const Duration(seconds: 1)})
+      : assert(!duration.isNegative, 'Duration must be positive'),
+        _duration = duration {
+    _stateSC.sink.add(ThrottlingStatus.idle);
+  }
   Duration _duration;
 
   /// Get current duration
@@ -10,47 +42,52 @@ class Throttling extends Stream<bool> implements Sink<Function> {
 
   /// Set new duration
   set duration(Duration value) {
-    assert(duration is Duration && !duration.isNegative);
+    assert(!duration.isNegative, 'Duration must be positive');
     _duration = value;
   }
 
-  bool _isReady = true;
+  /// {@nodoc}
+  Timer? _timer;
 
-  /// is ready
-  bool get isReady => _isReady;
-  Future<void> get _waiter => Future.delayed(_duration);
-  // ignore: close_sinks
-  final StreamController<bool> _stateSC = StreamController<bool>.broadcast();
+  /// Is ready to accept new events
+  bool get isIdle => switch (_timer?.isActive) {
+        true => false,
+        _ => true,
+      };
 
-  /// Throttling
-  /// Have method [throttle]
-  /// Must be closed with [close] method
-  Throttling({Duration duration = const Duration(seconds: 1)})
-      : assert(duration is Duration && !duration.isNegative),
-        _duration = duration {
-    _stateSC.sink.add(true);
-  }
+  /// Waiting for the end of the pause
+  bool get isBusy => !isIdle;
 
-  /// limits the maximum number of times a given
-  /// event handler can be called over time
-  dynamic throttle(Function func) {
-    if (!_isReady) return null;
-    _stateSC.sink.add(false);
-    _isReady = false;
-    _waiter.then((_) {
-      _isReady = true;
-      if (!_stateSC.isClosed) {
-        _stateSC.sink.add(true);
-      }
+  /// {@nodoc}
+  final StreamController<ThrottlingStatus> _stateSC =
+      StreamController<ThrottlingStatus>.broadcast(sync: true);
+
+  /// Limits the maximum number of times a given
+  /// event handler can be called over time.
+  ///
+  /// Returns the result of the function.
+  /// If the function is not ready to accept new events,
+  /// it returns null.
+  T? throttle(T Function() func) {
+    if (_stateSC.isClosed || !isIdle) return null;
+    _timer = Timer(_duration, () {
+      _timer = null;
+      if (_stateSC.isClosed) return;
+      _stateSC.sink.add(ThrottlingStatus.idle);
     });
-    return Function.apply(func, []);
+    _stateSC.sink.add(ThrottlingStatus.busy);
+    try {
+      return func();
+    } on Object {
+      rethrow;
+    }
   }
 
   @override
-  StreamSubscription<bool> listen(
-    void onData(bool event)?, {
+  StreamSubscription<ThrottlingStatus> listen(
+    void Function(ThrottlingStatus status)? onData, {
     Function? onError,
-    void onDone()?,
+    void Function()? onDone,
     bool? cancelOnError,
   }) =>
       _stateSC.stream.listen(
@@ -60,15 +97,14 @@ class Throttling extends Stream<bool> implements Sink<Function> {
         cancelOnError: cancelOnError,
       );
 
-  /// Closing instances of Sink prevents
-  /// memory leaks and unexpected behavior.
-  @Deprecated('Use [close] instead')
-  void dispose() => close();
-
   /// Shortcut for [throttle] method
   @override
-  dynamic add(Function data) => throttle(data);
+  T? add(T Function() data) => throttle(data);
 
   @override
-  Future<void> close() => _stateSC.close();
+  void close() {
+    _timer?.cancel();
+    _timer = null;
+    _stateSC.close().ignore();
+  }
 }
