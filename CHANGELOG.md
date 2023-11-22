@@ -1,3 +1,7 @@
+## 2.0.1
+
+- Update documentation
+
 ## 2.0.0
 
 - Migrate to Dart 3.0
