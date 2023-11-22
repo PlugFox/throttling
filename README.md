@@ -2,7 +2,7 @@
 
 ##### _contain "throttling" and "debouncing" classes_
 
-[![Actions Status](https://github.com/PlugFox/throttling/workflows/checkout/badge.svg)](https://github.com/PlugFox/throttling/actions)
+[![Actions Status](https://github.com/PlugFox/throttling/actions/workflows/checkout.yml/badge.svg)](https://github.com/PlugFox/throttling/actions/workflows/checkout.yml)
 [![Coverage](https://codecov.io/gh/PlugFox/throttling/branch/master/graph/badge.svg)](https://codecov.io/gh/PlugFox/throttling)
 [![Pub](https://img.shields.io/pub/v/throttling.svg)](https://pub.dev/packages/throttling)
 [![License: MIT](https://img.shields.io/badge/license-MIT-purple.svg)](https://opensource.org/licenses/MIT)
